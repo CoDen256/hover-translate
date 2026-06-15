@@ -1,0 +1,35 @@
+{
+  "tabLabel": "Debug",
+  "pageTitle": "Debug Inspector",
+  "fields": {
+    "enabled": {
+      "label": "Enable debug mode",
+      "helperText": "Activates DOM snapshot capture and subtitle event monitoring on the current tab"
+    },
+    "subtitleSelector": {
+      "label": "Subtitle CSS selector",
+      "placeholder": "e.g. .ytp-caption-segment",
+      "helperText": "CSS selector for the subtitle elements to monitor. Leave empty to capture full DOM only."
+    },
+    "snapshotInterval": {
+      "label": "Snapshot interval (ms)"
+    }
+  },
+  "actions": {
+    "refreshNow": "Refresh now",
+    "clearData": "Clear data",
+    "copyHtml": "Copy HTML"
+  },
+  "sections": {
+    "subtitleEvents": "Subtitle events",
+    "domSnapshot": "DOM snapshot",
+    "scopedSnapshot": "Scoped snapshot (selector match)"
+  },
+  "status": {
+    "noData": "No data captured yet. Enable debug mode on a tab with subtitles.",
+    "noEvents": "No subtitle events captured yet.",
+    "noSnapshot": "No snapshot yet.",
+    "noScopedSnapshot": "No scoped snapshot. Set a subtitle selector above.",
+    "capturedAt": "Captured at"
+  }
+}

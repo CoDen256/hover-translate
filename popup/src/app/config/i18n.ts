@@ -79,7 +79,7 @@ i18n
     fallbackLng: "en",
     supportedLngs: supportedLanguages,
     nonExplicitSupportedLngs: false,
-    ns: ["messages", "modals", "settings", "customize", "dictionary", "about", "common"],
+    ns: ["messages", "modals", "settings", "customize", "dictionary", "about", "common", "debug"],
     backend: {
       loadPath: `${baseUrl}_locales/{{lng}}/{{ns}}.json`,
     },

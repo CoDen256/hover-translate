@@ -5,7 +5,8 @@
   "version": "1.1.10",
   "default_locale": "en",
   "description": "__MSG_description__",
-  "permissions": ["storage"],
+  "permissions": ["storage", "tabs", "scripting", "activeTab"],
+  "host_permissions": ["<all_urls>"],
   "content_scripts": [
     {
       "all_frames": true,

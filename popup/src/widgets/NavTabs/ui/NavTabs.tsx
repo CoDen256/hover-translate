@@ -13,13 +13,14 @@ interface Tab {
 export const NavTabs = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useTranslation(["settings", "customize", "dictionary", "about"]);
+  const { t } = useTranslation(["settings", "customize", "dictionary", "about", "debug"]);
 
   const tabs: Tab[] = [
     { label: t("tabLabel", { ns: "settings" }), value: RouterPath.settings },
     { label: t("tabLabel", { ns: "customize" }), value: RouterPath.customize },
     { label: t("tabLabel", { ns: "dictionary" }), value: RouterPath.dictionary },
     { label: t("tabLabel", { ns: "about" }), value: RouterPath.about },
+    { label: t("tabLabel", { ns: "debug" }), value: RouterPath.debug },
   ];
 
   const handleChange = (_: SyntheticEvent, newPath: string) => {

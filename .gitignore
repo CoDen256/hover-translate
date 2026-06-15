@@ -7,4 +7,5 @@ dist/
 *.tsbuildinfo
 manifest.json
 /releases/
+/staging/
 CLAUDE.md

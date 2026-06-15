@@ -11,7 +11,8 @@
       "strict_min_version": "109.0"
     }
   },
-  "permissions": ["storage"],
+  "permissions": ["storage", "tabs", "scripting", "activeTab"],
+  "host_permissions": ["<all_urls>"],
   "content_scripts": [
     {
       "all_frames": true,

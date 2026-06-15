@@ -20,6 +20,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
+      "@shared": resolve(__dirname, "../extension/src/common"),
       "chrome": "webextension-polyfill"
     },
   },

@@ -18,6 +18,10 @@
     "release:chrome:dev": "npm run build:dev && node scripts/archive.js chrome dev",
     "release:edge:dev": "npm run build:dev && node scripts/archive.js edge dev",
     "release:firefox:dev": "npm run build:dev && node scripts/archive.js firefox dev",
+    "stage:chrome": "npm run build && node scripts/stage.js chrome",
+    "stage:edge": "npm run build && node scripts/stage.js edge",
+    "stage:firefox": "npm run build && node scripts/stage.js firefox",
+    "stage:chrome:dev": "npm run build:dev && node scripts/stage.js chrome",
     "source-archive": "node scripts/create-source-archive.js",
     "update:amo": "node scripts/update-amo-listing.js"
   },

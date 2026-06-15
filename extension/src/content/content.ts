@@ -30,5 +30,4 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-
 main();

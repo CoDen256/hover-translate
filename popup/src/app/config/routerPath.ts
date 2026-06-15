@@ -3,6 +3,7 @@ export enum AppRoutes {
   CUSTOMIZE = "customize",
   DICTIONARY = "dictionary",
   ABOUT = "about",
+  DEBUG = "debug",
   LOGIN = "login",
 }
 
@@ -11,5 +12,6 @@ export const RouterPath: Record<AppRoutes, string> = {
   [AppRoutes.CUSTOMIZE]: "/customize",
   [AppRoutes.DICTIONARY]: "/dictionary",
   [AppRoutes.ABOUT]: "/about",
+  [AppRoutes.DEBUG]: "/debug",
   [AppRoutes.LOGIN]: "/login",
 };
