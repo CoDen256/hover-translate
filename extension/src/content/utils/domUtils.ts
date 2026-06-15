@@ -1,8 +1,9 @@
-import { CAPTION_WINDOW_CONTAINER, CAPTION_WINDOW } from "../consts/consts.ts";
-
-export function isCaptionWindowInUpperHalf(): boolean {
-  const container = document.querySelector<HTMLElement>(`.${CAPTION_WINDOW_CONTAINER}`);
-  const captionWindow = document.querySelector<HTMLElement>(`.${CAPTION_WINDOW}`);
+export function isCaptionWindowInUpperHalf(
+  captionContainerSelector: string,
+  captionWindowSelector: string,
+): boolean {
+  const container = document.querySelector<HTMLElement>(captionContainerSelector);
+  const captionWindow = document.querySelector<HTMLElement>(captionWindowSelector);
 
   if (!container || !captionWindow) {
     return false;

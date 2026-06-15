@@ -9,8 +9,7 @@
   "host_permissions": ["<all_urls>"],
   "content_scripts": [
     {
-      "all_frames": true,
-      "matches": ["*://*.youtube.com/*"],
+      "matches": ["<all_urls>"],
       "js": ["extension/dist/content.bundle.js"],
       "css": ["extension/dist/styles.css"]
     }

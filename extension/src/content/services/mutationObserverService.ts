@@ -1,12 +1,10 @@
 import {
-  CAPTION_WINDOW_CONTAINER,
-  CAPTION_SEGMENT,
-  CAPTION_WINDOW,
   TOOLTIP_WORD_CLASS,
 } from "../consts/consts";
 import { SubtitleCore } from "../core/subtitleCore";
 import { VideoController } from "../core/videoController";
 import { TooltipService } from "./tooltipService.ts";
+import { ISiteAdapter } from "../../common/adapters/ISiteAdapter.ts";
 
 const RETRY_CONFIG = {
   MAX_RETRIES: 5,
@@ -33,7 +31,8 @@ export class MutationObserverService {
   constructor(
     private readonly subtitleCore: SubtitleCore,
     private readonly videoController: VideoController,
-    private readonly tooltipService: TooltipService
+    private readonly tooltipService: TooltipService,
+    private readonly siteAdapter: ISiteAdapter,
   ) {
     this.observer = new MutationObserver(this.handleMutations);
 
@@ -93,7 +92,7 @@ export class MutationObserverService {
   private handleAddedNode(node: Node): void {
     // If it's an Element, check for caption segments inside
     if (node instanceof Element) {
-      const segments = node.querySelectorAll(`.${CAPTION_SEGMENT}`);
+      const segments = node.querySelectorAll(this.siteAdapter.captionSegmentSelector);
       segments.forEach((segment) => {
         if (segment instanceof HTMLElement) {
           this.subtitleCore.splitCaptionIntoSpans(segment);
@@ -102,7 +101,7 @@ export class MutationObserverService {
       this.subtitleCore.updateCaptionWindowSize();
 
       // If it's a caption window, add events for pause/play
-      if (node.classList.contains(CAPTION_WINDOW)) {
+      if (node.matches(this.siteAdapter.captionWindowSelector)) {
         node.addEventListener("pointerenter", this.videoController.handleVideoPause);
         node.addEventListener("pointerleave", this.videoController.handleVideoPlay);
         node.addEventListener("pointerleave", this.subtitleCore.handlePointerLeaveOnCaptionWindow);
@@ -112,7 +111,7 @@ export class MutationObserverService {
     // For auto-generated captions (TEXT_NODE inside CaptionSegment)
     if (node.nodeType === Node.TEXT_NODE) {
       const captionSegment = node.parentElement;
-      if (captionSegment && captionSegment.classList.contains(CAPTION_SEGMENT)) {
+      if (captionSegment && captionSegment.matches(this.siteAdapter.captionSegmentSelector)) {
         this.subtitleCore.splitCaptionIntoSpans(captionSegment);
       }
     }
@@ -125,7 +124,7 @@ export class MutationObserverService {
    */
   private handleRemovedNode(node: Node): void {
     // If it's a caption window, remove events and delete tooltips
-    if (node instanceof Element && node.classList.contains(CAPTION_WINDOW)) {
+    if (node instanceof Element && node.matches(this.siteAdapter.captionWindowSelector)) {
       node.removeEventListener("pointerenter", this.videoController.handleVideoPause);
       node.removeEventListener("pointerleave", this.videoController.handleVideoPlay);
       node.removeEventListener("pointerleave", this.subtitleCore.handlePointerLeaveOnCaptionWindow);
@@ -143,7 +142,7 @@ export class MutationObserverService {
   private startObserving(retryCount: number = RETRY_CONFIG.MAX_RETRIES): void {
     this.stopObserving();
 
-    const captionContainer = document.querySelector(`.${CAPTION_WINDOW_CONTAINER}`);
+    const captionContainer = document.querySelector(this.siteAdapter.captionContainerSelector);
     if (captionContainer) {
       this.observer.observe(captionContainer, {
         childList: true,

@@ -1,10 +1,12 @@
-import { TOOLTIP_WORD_CLASS, CAPTION_SEGMENT, CAPTION_WINDOW, DATA_ATTRIBUTES } from "../consts/consts.ts";
+import { TOOLTIP_WORD_CLASS, DATA_ATTRIBUTES } from "../consts/consts.ts";
 import { TooltipService } from "../services/tooltipService.ts";
 import { state } from "../state/stateManager.ts";
+import { ISiteAdapter } from "../../common/adapters/ISiteAdapter.ts";
 
 export class SubtitleCore {
   constructor(
-    private readonly tooltipService: TooltipService
+    private readonly tooltipService: TooltipService,
+    private readonly siteAdapter: ISiteAdapter,
   ) {}
   
   public setWordsIndexes = () => {
@@ -78,7 +80,7 @@ export class SubtitleCore {
   }
 
   public updateCaptionWindowSize(): void {
-    const segments = document.querySelectorAll(`.${CAPTION_SEGMENT}`);
+    const segments = document.querySelectorAll(this.siteAdapter.captionSegmentSelector);
     let maxWidth = 0;
 
     segments.forEach((segment) => {
@@ -88,7 +90,7 @@ export class SubtitleCore {
       }
     });
 
-    const captionWindow = document.querySelector(`.${CAPTION_WINDOW}`);
+    const captionWindow = document.querySelector(this.siteAdapter.captionWindowSelector);
     if (captionWindow instanceof HTMLElement) {
       captionWindow.style.width = `${maxWidth}px`;
     }

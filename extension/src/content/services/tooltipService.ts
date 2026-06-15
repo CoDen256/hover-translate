@@ -3,9 +3,7 @@ import alpha from "color-alpha";
 
 import {
   TOOLTIP_CLASS,
-  CAPTION_WINDOW,
   TOOLTIP_WORD_CLASS,
-  CAPTION_SEGMENT,
   DATA_ATTRIBUTES,
   TOOLTIP_SELECTED_WORD_CLASS,
   TOOLTIP_SETTINGS, NOTIFICATION_TOOLTIP_CLASS,
@@ -15,6 +13,7 @@ import { TranslationCore } from "../core/translationCore";
 import { StorageService } from "../../common/services/storageService.ts";
 import { state } from "../state/stateManager.ts";
 import { TranslationData } from "../../common/types/translations.ts";
+import { ISiteAdapter } from "../../common/adapters/ISiteAdapter.ts";
 
 interface AbortableElement extends HTMLElement {
   abortController?: AbortController;
@@ -27,6 +26,7 @@ export class TooltipService {
 
   constructor(
     private readonly translationCore: TranslationCore,
+    private readonly siteAdapter: ISiteAdapter,
     private readonly storageService: StorageService = new StorageService(),
   )
   {
@@ -62,7 +62,7 @@ export class TooltipService {
 
     if (!translatedData) return;
 
-    const subtitlesContainer = document.querySelector<HTMLElement>(`.${CAPTION_WINDOW}`);
+    const subtitlesContainer = document.querySelector<HTMLElement>(this.siteAdapter.captionWindowSelector);
     if (!subtitlesContainer || !translatedData.translatedText) return;
 
     this.deleteActiveTooltip();
@@ -111,7 +111,7 @@ export class TooltipService {
   }
 
   private positionNotificationTooltip(tooltip: HTMLDivElement) {
-    const video = document.querySelector("video");
+    const video = this.siteAdapter.getBoundingContainer();
 
     if (!video) return;
 
@@ -125,7 +125,8 @@ export class TooltipService {
   }
 
   private styleTooltip(tooltip: HTMLDivElement) {
-    const captionSegment = document.querySelector<HTMLElement>(`.${CAPTION_SEGMENT}`);
+    const captionSegment = this.siteAdapter.getStyleReferenceElement?.() ??
+      document.querySelector<HTMLElement>(this.siteAdapter.captionSegmentSelector);
     if (!captionSegment) return;
 
     const youtubeSubtitleContainerStyles = window.getComputedStyle(captionSegment);
@@ -198,7 +199,7 @@ export class TooltipService {
     tooltip.style.visibility = "hidden";
     tooltip.style.position = "absolute";
 
-    const video = document.querySelector("video");
+    const video = this.siteAdapter.getBoundingContainer();
     if (!video) return;
 
     const TOOLTIP_MARGIN = 10;
@@ -222,7 +223,7 @@ export class TooltipService {
     // Position tooltip above or below subtitles based on screen location
     const tooltipHeight = tooltip.offsetHeight;
     let topPosition;
-    if (isCaptionWindowInUpperHalf()) {
+    if (isCaptionWindowInUpperHalf(this.siteAdapter.captionContainerSelector, this.siteAdapter.captionWindowSelector)) {
       topPosition = rectSubtitlesContainer.bottom + TOOLTIP_GAP + window.scrollY;
     } else {
       topPosition = rectSubtitlesContainer.top - tooltipHeight - TOOLTIP_GAP + window.scrollY;
