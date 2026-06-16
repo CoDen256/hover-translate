@@ -48,6 +48,13 @@ export class MutationObserverService {
    */
   private handleMutations = (mutations: MutationRecord[]): void => {
     mutations.forEach((mutation) => {
+      // React (and other frameworks) update subtitle text via characterData mutations
+      // (mutating an existing text node in-place) rather than replacing child nodes.
+      if (mutation.type === "characterData") {
+        this.handleCharacterDataMutation(mutation);
+        return;
+      }
+
       // 1. If new words are added to the captions, update the indexes and clear the selected words.
       this.checkForNewWords(mutation);
 
@@ -62,6 +69,29 @@ export class MutationObserverService {
       });
     });
   };
+
+  /**
+   * Handles a text-node character data change. Fires when React (or similar)
+   * updates subtitle text in-place instead of replacing child nodes.
+   */
+  private handleCharacterDataMutation(mutation: MutationRecord): void {
+    const textNode = mutation.target;
+    const parent = textNode.parentElement;
+    if (!parent) return;
+
+    // Direct text node inside the caption segment
+    if (parent.matches(this.siteAdapter.captionSegmentSelector)) {
+      this.subtitleCore.splitCaptionIntoSpans(parent);
+      return;
+    }
+
+    // Text node inside one of our word spans (can happen after we've already split);
+    // walk up to find the caption segment and re-split it.
+    const segment = parent.closest(this.siteAdapter.captionSegmentSelector);
+    if (segment instanceof HTMLElement) {
+      this.subtitleCore.splitCaptionIntoSpans(segment);
+    }
+  }
 
   /**
    * Checks if there is a new subtitle word (TOOLTIP_WORD_CLASS) in the added nodes.
@@ -92,6 +122,11 @@ export class MutationObserverService {
   private handleAddedNode(node: Node): void {
     // If it's an Element, check for caption segments inside
     if (node instanceof Element) {
+      // The node itself may be a caption segment (querySelectorAll only finds descendants)
+      if (node instanceof HTMLElement && node.matches(this.siteAdapter.captionSegmentSelector)) {
+        this.subtitleCore.splitCaptionIntoSpans(node);
+      }
+
       const segments = node.querySelectorAll(this.siteAdapter.captionSegmentSelector);
       segments.forEach((segment) => {
         if (segment instanceof HTMLElement) {
@@ -147,6 +182,7 @@ export class MutationObserverService {
       this.observer.observe(captionContainer, {
         childList: true,
         subtree: true,
+        characterData: true,
       });
       // eslint-disable-next-line no-console
       console.log(LOG_MESSAGES.OBSERVING_STARTED);

@@ -31,4 +31,11 @@ export interface ISiteAdapter {
    * Defaults to querying captionSegmentSelector if not implemented.
    */
   getStyleReferenceElement?(): HTMLElement | null;
+
+  /**
+   * Optional: site-specific CSS injected as a <style> tag when this adapter
+   * is active. Use for overrides that only make sense on this site (e.g.
+   * pointer-events fixes, hit-box padding). Keeps shared styles.css clean.
+   */
+  readonly styles?: string;
 }

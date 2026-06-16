@@ -13,7 +13,8 @@ export class YouTubeSiteAdapter implements ISiteAdapter {
 
   getBoundingContainer(): Element | null {
     return (
-      document.querySelector(".ytp-player-content") ??
+      document.querySelector("#movie_player") ??
+      document.querySelector(".html5-video-player") ??
       document.querySelector("video")
     );
   }

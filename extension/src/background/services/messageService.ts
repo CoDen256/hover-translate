@@ -34,38 +34,48 @@ function captureSnapshotFn(selector: string, maxBytes: number) {
 function startObserverFn(selector: string) {
   if (window !== window.top) return;
 
-  const win = window as Window & { __htDebugObserver?: MutationObserver };
+  type DebugWin = Window & {
+    __htDebugObserver?: MutationObserver;
+    __htDebugTimer?: ReturnType<typeof setTimeout>;
+    __htDebugLastText?: string;
+  };
+  const win = window as DebugWin;
   win.__htDebugObserver?.disconnect();
+  clearTimeout(win.__htDebugTimer);
   win.__htDebugObserver = undefined;
+  win.__htDebugLastText = undefined;
 
   if (!selector) return;
 
-  let target: Element;
-  try {
-    target = document.querySelector(selector)?.parentElement ?? document.body;
-  } catch {
-    target = document.body;
-  }
-
   const observer = new MutationObserver(() => {
-    try {
-      const els = document.querySelectorAll(selector);
-      if (!els.length) return;
-      const texts = Array.from(els)
-        .map((e) => e.textContent?.trim() ?? "")
-        .filter(Boolean);
-      if (!texts.length) return;
-      const html = Array.from(els)
-        .map((e) => (e as HTMLElement).outerHTML)
-        .join("\n");
-      chrome.runtime.sendMessage({
-        action: "debugSubtitleEvent",
-        data: { texts, selector, timestamp: Date.now(), html },
-      });
-    } catch { /* ignore */ }
+    // Debounce: wait 150ms after the last mutation before reading the DOM.
+    // This prevents hammering chrome.runtime.sendMessage on every animation frame.
+    clearTimeout(win.__htDebugTimer);
+    win.__htDebugTimer = setTimeout(() => {
+      try {
+        const els = document.querySelectorAll(selector);
+        if (!els.length) return;
+        const texts = Array.from(els)
+          .map((e) => e.textContent?.trim() ?? "")
+          .filter(Boolean);
+        if (!texts.length) return;
+        const joined = texts.join("\n");
+        // Skip if the subtitle text hasn't actually changed since the last send.
+        if (joined === win.__htDebugLastText) return;
+        win.__htDebugLastText = joined;
+        const html = Array.from(els)
+          .map((e) => (e as HTMLElement).outerHTML)
+          .join("\n");
+        chrome.runtime.sendMessage({
+          action: "debugSubtitleEvent",
+          data: { texts, selector, timestamp: Date.now(), html },
+        });
+      } catch { /* ignore */ }
+    }, 150);
   });
 
-  observer.observe(target, { childList: true, subtree: true, characterData: true });
+  // Always observe document.body so the observer survives container element replacements.
+  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
   win.__htDebugObserver = observer;
   console.log("[HoverTranslate Debug] Observer started for:", selector);
 }

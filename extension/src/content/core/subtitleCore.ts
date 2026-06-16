@@ -18,9 +18,27 @@ export class SubtitleCore {
     });
   };
 
+  private extractText(element: HTMLElement): string {
+    let text = "";
+    element.childNodes.forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        text += node.textContent ?? "";
+      } else if (node instanceof HTMLElement) {
+        if (node.tagName === "BR") {
+          text += " ";
+        } else {
+          // Include text from child elements (word spans from a previous split,
+          // or any other inline wrappers a site might use).
+          text += node.textContent ?? "";
+        }
+      }
+    });
+    return text.trim();
+  }
+
   public splitCaptionIntoSpans(captionSegment: HTMLElement) {
-    const text = captionSegment.textContent?.trim() ?? "";
-    const words = text.split(/\s+/);
+    const text = this.extractText(captionSegment) || captionSegment.textContent?.trim() || "";
+    const words = text.split(/\s+/).filter(Boolean);
     const fragment = document.createDocumentFragment();
 
     words.forEach((word) => {

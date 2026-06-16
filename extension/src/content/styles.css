@@ -18,6 +18,11 @@
     pointer-events: none;
 }
 
+.custom-tooltip-word {
+    pointer-events: auto;
+}
+
+
 .custom-tooltip-word:hover {
     background-color: #808080;
 }

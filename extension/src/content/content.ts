@@ -8,13 +8,27 @@ import { MutationObserverService } from "./services/mutationObserverService.ts";
 import { TranslatorFactory } from "../common/translators/TranslatorFactory.ts";
 import { SiteAdapterRegistry } from "../common/adapters/SiteAdapterRegistry.ts";
 import { YouTubeSiteAdapter } from "../common/adapters/YouTubeSiteAdapter.ts";
+import { CinebySiteAdapter } from "../common/adapters/CinebySiteAdapter.ts";
 
 SiteAdapterRegistry.register(new YouTubeSiteAdapter());
+SiteAdapterRegistry.register(new CinebySiteAdapter());
+
+function injectAdapterStyles(styles: string, id: string): void {
+  document.getElementById(id)?.remove();
+  const el = document.createElement("style");
+  el.id = id;
+  el.textContent = styles;
+  (document.head ?? document.documentElement).appendChild(el);
+}
 
 const main = async () => {
   try {
     const adapter = SiteAdapterRegistry.getActiveAdapter();
     if (!adapter) return;
+
+    if (adapter.styles) {
+      injectAdapterStyles(adapter.styles, "ht-adapter-styles");
+    }
 
     const settings = await chrome.storage.sync.get("settings");
 

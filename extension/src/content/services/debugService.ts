@@ -1,6 +1,6 @@
 import { DebugConfig } from "../../common/types/debug.ts";
 
-const DOM_SNAPSHOT_MAX_BYTES = 150_000;
+const DOM_SNAPSHOT_MAX_BYTES = 1_150_000;
 
 export class DebugService {
   private subtitleObserver: MutationObserver | null = null;
