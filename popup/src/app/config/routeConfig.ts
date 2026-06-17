@@ -8,6 +8,7 @@ import { CustomizePage, CustomizePageSkeleton } from "@/pages/CustomizePage";
 import { DictionaryPage, DictionaryPageSkeleton } from "@/pages/DictionaryPage";
 import { AboutPage, AboutPageSkeleton } from "@/pages/AboutPage";
 import { DebugPage, DebugPageSkeleton } from "@/pages/DebugPage";
+import { SyncPage, SyncPageSkeleton } from "@/pages/SyncPage";
 
 export interface RouteConfig {
   path: string,
@@ -48,5 +49,10 @@ export const routeConfig: RouteConfig[] = [
     path: RouterPath.debug,
     element: DebugPage,
     skeleton: DebugPageSkeleton,
+  },
+  {
+    path: RouterPath.sync,
+    element: SyncPage,
+    skeleton: SyncPageSkeleton,
   },
 ];

@@ -4,6 +4,7 @@ export enum AppRoutes {
   DICTIONARY = "dictionary",
   ABOUT = "about",
   DEBUG = "debug",
+  SYNC = "sync",
   LOGIN = "login",
 }
 
@@ -13,5 +14,6 @@ export const RouterPath: Record<AppRoutes, string> = {
   [AppRoutes.DICTIONARY]: "/dictionary",
   [AppRoutes.ABOUT]: "/about",
   [AppRoutes.DEBUG]: "/debug",
+  [AppRoutes.SYNC]: "/sync",
   [AppRoutes.LOGIN]: "/login",
 };

@@ -2,6 +2,7 @@
 import { SettingsService } from "./services/settingsService.ts";
 import {  MessageService } from "./services/messageService.ts";
 import { DebugDataService } from "./services/debugDataService.ts";
+import { AnkiBackgroundService } from "./services/ankiBackgroundService.ts";
 
 const main = () => {
   try {
@@ -10,6 +11,7 @@ const main = () => {
     const debugDataService = new DebugDataService();
     new MessageService(debugDataService);
     new SettingsService();
+    new AnkiBackgroundService();
   } catch (error) {
     console.error(error);
   }

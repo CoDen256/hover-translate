@@ -1,0 +1,34 @@
+{
+  "tabLabel": "Sync",
+  "pageTitle": "AnkiWeb Sync",
+  "login": {
+    "email": "Email",
+    "password": "Password",
+    "connect": "Connect",
+    "connecting": "Connecting..."
+  },
+  "status": {
+    "connected": "Connected",
+    "notConnected": "Not connected"
+  },
+  "settings": {
+    "deck": "Deck",
+    "notetype": "Note type",
+    "frontField": "Front field",
+    "backField": "Back field",
+    "autoSync": "Auto-sync saved words to AnkiWeb",
+    "save": "Save settings",
+    "saved": "Settings saved",
+    "testCard": "Send test card",
+    "testSuccess": "Test card added successfully — check your Anki deck",
+    "testFailed": "Test card failed"
+  },
+  "history": {
+    "title": "Recently added cards"
+  },
+  "disconnect": "Disconnect",
+  "errors": {
+    "loginFailed": "Login failed",
+    "loadFailed": "Failed to load Anki info"
+  }
+}

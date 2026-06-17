@@ -352,6 +352,14 @@ export class TooltipService {
 
     await this.storageService.set("savedTranslations", filteredTranslations, "local");
     this.showNotificationTooltip(chrome.i18n.getMessage("translationSaved"));
+
+    const ankiStored = await chrome.storage.sync.get("ankiSettings");
+    if (ankiStored?.ankiSettings?.enabled && currentData) {
+      chrome.runtime.sendMessage({
+        action: "ankiAddCard",
+        data: { front: currentData.originalText, back: currentData.translatedText },
+      });
+    }
   };
 
   public saveOriginalTextToClipboard = async () => {
