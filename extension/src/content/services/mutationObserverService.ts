@@ -120,7 +120,6 @@ export class MutationObserverService {
    * - add events to the caption window (mouseenter/mouseleave).
    */
   private handleAddedNode(node: Node): void {
-    // If it's an Element, check for caption segments inside
     if (node instanceof Element) {
       // The node itself may be a caption segment (querySelectorAll only finds descendants)
       if (node instanceof HTMLElement && node.matches(this.siteAdapter.captionSegmentSelector)) {
@@ -135,7 +134,6 @@ export class MutationObserverService {
       });
       this.subtitleCore.updateCaptionWindowSize();
 
-      // If it's a caption window, add events for pause/play
       if (node.matches(this.siteAdapter.captionWindowSelector)) {
         node.addEventListener("pointerenter", this.videoController.handleVideoPause);
         node.addEventListener("pointerleave", this.videoController.handleVideoPlay);
@@ -155,16 +153,19 @@ export class MutationObserverService {
   /**
    * Handle removed node:
    * - remove events,
-   * - delete tooltips and clear selected words.
+   * - delete tooltips and clear selected words,
+   * - resume video if the subtitle disappeared while the cursor was inside it.
    */
   private handleRemovedNode(node: Node): void {
-    // If it's a caption window, remove events and delete tooltips
     if (node instanceof Element && node.matches(this.siteAdapter.captionWindowSelector)) {
       node.removeEventListener("pointerenter", this.videoController.handleVideoPause);
       node.removeEventListener("pointerleave", this.videoController.handleVideoPlay);
       node.removeEventListener("pointerleave", this.subtitleCore.handlePointerLeaveOnCaptionWindow);
       this.tooltipService.deleteActiveTooltip();
       this.tooltipService.clearSelectedWords();
+      // pointerleave never fires when an element is removed from the DOM, so
+      // explicitly resume the video to avoid it staying stuck in a paused state.
+      this.videoController.handleVideoPlay();
     }
   }
 

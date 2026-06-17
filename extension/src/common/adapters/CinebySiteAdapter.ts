@@ -13,13 +13,11 @@ export class CinebySiteAdapter implements ISiteAdapter {
     .cineby-cue {
       pointer-events: auto;
     }
-    /* The subtitle container sits at z-20 but the video controls are at z-30,
-       and their areas overlap by ~16px. Elevate the subtitle container so word
-       spans receive pointer events in that overlap zone. The container itself
-       keeps pointer-events:none so controls remain fully interactive outside
-       the subtitle text area. */
+    /* Elevate the caption window above the controls layer (z-30) so that
+       pointer events in the overlap zone go to the subtitle, not the controls. */
     div:has(> .cineby-cue) {
       z-index: 50 !important;
+      pointer-events: auto;
     }
   `;
 
