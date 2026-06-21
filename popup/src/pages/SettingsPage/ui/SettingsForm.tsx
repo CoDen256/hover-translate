@@ -1,12 +1,15 @@
 import { FC, useCallback, useEffect, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
+import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
 import Switch from "@mui/material/Switch";
+import TextField from "@mui/material/TextField";
 import Alert from "@mui/material/Alert";
 
 import { AvailableLanguages, Language, LeftClickAction, SettingsFormValues, Translator } from "../model/types/schema.ts";
@@ -177,6 +180,28 @@ export const SettingsForm: FC<SettingsFormProps> = ({
                 handleSubmit(onSubmit)();
               }}
               options={targetOptions}
+            />
+          )}
+        />
+        <Controller
+          name="targetLanguageCodes"
+          control={control}
+          render={({ field }) => (
+            <Autocomplete
+              multiple
+              options={targetOptions}
+              getOptionLabel={(o) => o.label}
+              value={targetOptions.filter(o => (field.value ?? []).includes(o.value))}
+              onChange={(_, selected) => {
+                setValue("targetLanguageCodes", selected.map(o => o.value), { shouldDirty: true });
+                handleSubmit(onSubmit)();
+              }}
+              renderTags={(values, getTagProps) =>
+                values.map((o, i) => <Chip {...getTagProps({ index: i })} key={o.value} label={o.label} size="small" />)
+              }
+              renderInput={(params) => (
+                <TextField {...params} size="small" label={t("fields.targetLanguageCodes.label")} />
+              )}
             />
           )}
         />

@@ -36,21 +36,22 @@ export class TranslationCore {
     this.storageService.set<TranslationCacheFromStorage>("translationCache", newCacheArray, "local");
   }
 
-  async translateText(text: string, signal?: AbortSignal): Promise<TranslationCacheData | null> {
+  async translateText(text: string, signal?: AbortSignal, targetLang?: string): Promise<TranslationCacheData | null> {
     const normalizedText = text.trim();
 
     if (!normalizedText) {
       return null;
     }
 
-    const cacheKey = `${normalizedText}_${state.settings.sourceLanguageCode}_${state.settings.targetLanguageCode}_${this.translator.key}`;
+    const tgt = targetLang ?? state.settings.targetLanguageCode;
+    const cacheKey = `${normalizedText}_${state.settings.sourceLanguageCode}_${tgt}_${this.translator.key}`;
 
     if (this.translationCache.has(cacheKey)) {
       const cachedData = this.translationCache.get(cacheKey);
       if (!cachedData) {
         return null;
       }
-      this.currentTranslationData = cachedData;
+      if (!targetLang) this.currentTranslationData = cachedData;
       return cachedData;
     }
 
@@ -58,7 +59,7 @@ export class TranslationCore {
       const translatedData = await this.translator.translate(
         normalizedText,
         state.settings.sourceLanguageCode,
-        state.settings.targetLanguageCode,
+        tgt,
         signal
       );
 
@@ -68,7 +69,7 @@ export class TranslationCore {
 
       const result: TranslationCacheData = {
         sourceLanguageCode: translatedData.detectedLanguageCode,
-        targetLanguageCode: state.settings.targetLanguageCode,
+        targetLanguageCode: tgt,
         translatedText: translatedData.translatedText,
         originalText: text,
         dictionary: translatedData.dictionary,
@@ -77,7 +78,7 @@ export class TranslationCore {
         translatorName: this.translator.name,
       };
 
-      this.currentTranslationData = result;
+      if (!targetLang) this.currentTranslationData = result;
       this.translationCache.set(cacheKey, result);
       this.saveTranslationCache();
 

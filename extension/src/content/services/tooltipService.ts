@@ -55,9 +55,15 @@ export class TooltipService {
     const abortController = new AbortController();
     targetNode.abortController = abortController;
 
-    const translatedData = await this.translationCore.translateText(textToTranslate, abortController.signal);
+    const extraLangs = (state.settings.targetLanguageCodes ?? [])
+      .filter(l => l !== state.settings.targetLanguageCode);
 
-    // Delete link to abortController after request is done
+    const [translatedData, ...extraResults] = await Promise.all([
+      this.translationCore.translateText(textToTranslate, abortController.signal),
+      ...extraLangs.map(lang => this.translationCore.translateText(textToTranslate, abortController.signal, lang)),
+    ]);
+
+    // Delete link to abortController after all requests are done
     delete targetNode.abortController;
 
     if (!translatedData) return;
@@ -72,7 +78,28 @@ export class TooltipService {
 
     const tooltip = document.createElement("div");
     tooltip.className = TOOLTIP_CLASS;
-    tooltip.textContent = translatedData.translatedText;
+
+    const allRows: { lang: string; text: string }[] = [
+      { lang: state.settings.targetLanguageCode, text: translatedData.translatedText },
+      ...extraLangs.map((lang, i) => ({ lang, text: extraResults[i]?.translatedText ?? "" })).filter(r => r.text),
+    ];
+
+    if (allRows.length === 1) {
+      tooltip.textContent = allRows[0].text;
+    } else {
+      tooltip.style.display = "flex";
+      tooltip.style.flexDirection = "column";
+      tooltip.style.gap = "2px";
+      allRows.forEach(({ lang, text }) => {
+        const row = document.createElement("span");
+        const label = document.createElement("small");
+        label.textContent = lang + " ";
+        label.style.opacity = "0.65";
+        row.appendChild(label);
+        row.appendChild(document.createTextNode(text));
+        tooltip.appendChild(row);
+      });
+    }
 
     tooltip.style.visibility = "hidden";
 

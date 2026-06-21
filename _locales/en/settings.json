@@ -12,6 +12,9 @@
       "label": "Translate to",
       "tooltip": "The language to which the text will be translated"
     },
+    "targetLanguageCodes": {
+      "label": "Also translate to (optional)"
+    },
     "sourceLanguageCode": {
       "label": "Translate from",
       "tooltip": "The language from which the text will be translated"

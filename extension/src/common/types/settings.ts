@@ -4,6 +4,7 @@ export type LeftClickAction = "nothing" | "copy-original" | "copy-translation" |
 export interface Settings {
   sourceLanguageCode: string;
   targetLanguageCode: string;
+  targetLanguageCodes?: string[];
   autoPause: boolean;
   translator: Translator;
   leftClickAction: LeftClickAction;
