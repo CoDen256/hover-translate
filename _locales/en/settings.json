@@ -28,6 +28,14 @@
       "tooltip": "Automatically pause the video when hovering over subtitles",
       "helperText": "Automatically pause the video when hovering over subtitles"
     },
+    "replaySeconds": {
+      "label": "Scroll down to replay",
+      "tooltip": "Scroll down while hovering subtitles to jump back and replay",
+      "options": {
+        "disabled": "Disabled",
+        "seconds": "{{n}} seconds"
+      }
+    },
     "leftClickAction": {
       "label": "Left click action",
       "tooltip": "Action to perform when left-clicking on words in subtitles",

@@ -6,6 +6,7 @@ export const defaultSettings: Settings = {
   targetLanguageCodes: [],
   translator: "google",
   autoPause: true,
+  replaySeconds: 3,
   leftClickAction: "save-to-dictionary",
   alwaysMultipleSelection: false,
   showNotifications: true,

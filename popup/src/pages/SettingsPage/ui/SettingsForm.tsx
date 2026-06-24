@@ -249,6 +249,29 @@ export const SettingsForm: FC<SettingsFormProps> = ({
           )}
         />
         <Controller
+          name="replaySeconds"
+          control={control}
+          render={() => (
+            <SettingsSelect
+              id="replaySeconds"
+              label={t("fields.replaySeconds.label")}
+              tooltip={t("fields.replaySeconds.tooltip")}
+              value={String(watch("replaySeconds") ?? 3)}
+              onChange={(value) => {
+                setValue("replaySeconds", Number(value), { shouldDirty: true });
+                handleSubmit(onSubmit)();
+              }}
+              options={[
+                { value: "0", label: t("fields.replaySeconds.options.disabled") },
+                { value: "2", label: t("fields.replaySeconds.options.seconds", { n: 2 }) },
+                { value: "3", label: t("fields.replaySeconds.options.seconds", { n: 3 }) },
+                { value: "5", label: t("fields.replaySeconds.options.seconds", { n: 5 }) },
+                { value: "10", label: t("fields.replaySeconds.options.seconds", { n: 10 }) },
+              ]}
+            />
+          )}
+        />
+        <Controller
           name="alwaysMultipleSelection"
           control={control}
           render={({ field }) => (

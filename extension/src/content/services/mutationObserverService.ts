@@ -5,6 +5,7 @@ import { SubtitleCore } from "../core/subtitleCore";
 import { VideoController } from "../core/videoController";
 import { TooltipService } from "./tooltipService.ts";
 import { ISiteAdapter } from "../../common/adapters/ISiteAdapter.ts";
+import { state } from "../state/stateManager.ts";
 
 const RETRY_CONFIG = {
   MAX_RETRIES: 5,
@@ -27,6 +28,7 @@ const LOG_MESSAGES = {
 export class MutationObserverService {
   private observer: MutationObserver;
   private urlObserver?: MutationObserver;
+  private lastSeekTime = 0;
 
   constructor(
     private readonly subtitleCore: SubtitleCore,
@@ -138,6 +140,7 @@ export class MutationObserverService {
         node.addEventListener("pointerenter", this.videoController.handleVideoPause);
         node.addEventListener("pointerleave", this.videoController.handleVideoPlay);
         node.addEventListener("pointerleave", this.subtitleCore.handlePointerLeaveOnCaptionWindow);
+        node.addEventListener("wheel", this.handleCaptionWheel, { passive: false });
       }
     }
 
@@ -161,6 +164,7 @@ export class MutationObserverService {
       node.removeEventListener("pointerenter", this.videoController.handleVideoPause);
       node.removeEventListener("pointerleave", this.videoController.handleVideoPlay);
       node.removeEventListener("pointerleave", this.subtitleCore.handlePointerLeaveOnCaptionWindow);
+      node.removeEventListener("wheel", this.handleCaptionWheel);
       this.tooltipService.deleteActiveTooltip();
       this.tooltipService.clearSelectedWords();
       // pointerleave never fires when an element is removed from the DOM, so
@@ -207,6 +211,18 @@ export class MutationObserverService {
       setTimeout(() => this.startObserving(RETRY_CONFIG.MAX_RETRIES), RETRY_CONFIG.INITIAL_DELAY);
     }
   }
+
+  private handleCaptionWheel = (event: Event): void => {
+    const seconds = state.settings.replaySeconds;
+    if (!seconds) return;
+    if ((event as WheelEvent).deltaY <= 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const now = Date.now();
+    if (now - this.lastSeekTime < 400) return;
+    this.lastSeekTime = now;
+    this.videoController.seekBack(seconds);
+  };
 
   private stopObserving(): void {
     this.observer.disconnect();

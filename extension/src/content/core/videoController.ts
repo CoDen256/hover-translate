@@ -4,9 +4,11 @@ export class VideoController {
   private userPausedVideo = false;
   private wasPausedByScript = false;
   private replayGuard: (() => void) | null = null;
+  private seekingUntil = 0;
 
   public handleVideoPause = () => {
     if (!state.settings.autoPause) return;
+    if (Date.now() < this.seekingUntil) return;
 
     const video = this.getVideoElement();
     if (!video) return;
@@ -43,6 +45,18 @@ export class VideoController {
       this.wasPausedByScript = false;
     }
   };
+
+  public seekBack(seconds: number): void {
+    const video = this.getVideoElement();
+    if (!video) return;
+    this.removeReplayGuard(video);
+    this.wasPausedByScript = false;
+    // Suppress handleVideoPause for 1s so a subtitle DOM re-enter after the seek
+    // doesn't immediately re-pause the video.
+    this.seekingUntil = Date.now() + 1000;
+    video.currentTime = Math.max(0, video.currentTime - seconds);
+    video.play();
+  }
 
   private removeReplayGuard(video: HTMLVideoElement): void {
     if (this.replayGuard) {

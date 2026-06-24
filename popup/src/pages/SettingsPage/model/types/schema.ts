@@ -6,6 +6,7 @@ export interface SettingsFormValues {
   targetLanguageCode: string;
   targetLanguageCodes?: string[];
   autoPause: boolean;
+  replaySeconds: number;
   translator: Translator;
   leftClickAction: LeftClickAction;
   alwaysMultipleSelection: boolean;
