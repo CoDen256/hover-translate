@@ -42,6 +42,11 @@ export class TooltipService {
   }
 
   private async showTooltip(targetNode: AbortableElement) {
+    // Capture synchronously — a subtitle update racing the async translation
+    // can call clearSelectedWords(), nulling firstSelectedWordNode mid-flight.
+    const anchorNode = this.firstSelectedWordNode;
+    if (!anchorNode) return;
+
     const sortedWordNodes = Array.from(this.selectedWordsNodes).sort((a, b) => {
       const aIndex = parseInt(a.getAttribute(DATA_ATTRIBUTES.INDEX) ?? "0", 10);
       const bIndex = parseInt(b.getAttribute(DATA_ATTRIBUTES.INDEX) ?? "0", 10);
@@ -73,8 +78,10 @@ export class TooltipService {
 
     this.deleteActiveTooltip();
 
-    if (!subtitlesContainer.contains(targetNode)) return;
-    if (!this.firstSelectedWordNode) return;
+    // Use document.body.contains instead of subtitlesContainer.contains — on sites
+    // like Netflix the subtitle DOM may be rebuilt during the async translation,
+    // orphaning targetNode from the container even though the hover is still valid.
+    if (!document.body.contains(anchorNode)) return;
 
     const tooltip = document.createElement("div");
     tooltip.className = TOOLTIP_CLASS;
@@ -108,7 +115,7 @@ export class TooltipService {
     container.appendChild(tooltip);
 
     this.styleTooltip(tooltip);
-    this.positionTooltip(this.firstSelectedWordNode, tooltip, subtitlesContainer);
+    this.positionTooltip(anchorNode, tooltip, subtitlesContainer);
   }
 
   private async showNotificationTooltip(text: string) {
@@ -322,31 +329,55 @@ export class TooltipService {
     this.selectedWordsNodes.clear();
   };
 
+  public handleWordClick(): void {
+    switch (state.settings.leftClickAction) {
+    case "save-to-dictionary":
+      this.saveTranslationToDictionary();
+      break;
+    case "copy-original":
+      this.saveOriginalTextToClipboard();
+      break;
+    case "copy-translation":
+      this.saveTranslationToClipboard();
+      break;
+    case "nothing":
+      break;
+    default:
+      break;
+    }
+  }
+
+  public onWordEnter(target: HTMLElement): void {
+    const t = target as AbortableElement;
+    if (!this.selectedWordsNodes.has(target)) {
+      this.updateSelectedWords(target);
+    }
+    this.showTooltip(t);
+  }
+
+  public onWordLeave(target: HTMLElement, shiftKey: boolean): void {
+    const t = target as AbortableElement;
+    if (t.abortController) {
+      t.abortController.abort();
+      delete t.abortController;
+    }
+    if (!shiftKey && !state.settings.alwaysMultipleSelection) {
+      this.clearSelectedWords();
+    }
+    this.deleteActiveTooltip();
+  }
+
   public handleWordMouseEnter = (event: PointerEvent) => {
     const target = event.target as AbortableElement;
     if (target.classList.contains(TOOLTIP_WORD_CLASS)) {
-      if (!this.selectedWordsNodes.has(target)) {
-        this.updateSelectedWords(target);
-      }
-
-      this.showTooltip(target);
+      this.onWordEnter(target);
     }
   };
 
   public handleWordMouseLeave = (event: PointerEvent) => {
     const target = event.target as AbortableElement;
     if (target.classList.contains(TOOLTIP_WORD_CLASS)) {
-      // Cancel the request if it's still pending
-      if (target.abortController) {
-        target.abortController.abort();
-        delete target.abortController;
-      }
-
-      if (!event.shiftKey && !state.settings.alwaysMultipleSelection) {
-        this.clearSelectedWords();
-      }
-
-      this.deleteActiveTooltip();
+      this.onWordLeave(target, event.shiftKey);
     }
   };
 

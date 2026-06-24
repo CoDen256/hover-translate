@@ -9,9 +9,11 @@ import { TranslatorFactory } from "../common/translators/TranslatorFactory.ts";
 import { SiteAdapterRegistry } from "../common/adapters/SiteAdapterRegistry.ts";
 import { YouTubeSiteAdapter } from "../common/adapters/YouTubeSiteAdapter.ts";
 import { CinebySiteAdapter } from "../common/adapters/CinebySiteAdapter.ts";
+import { NetflixSiteAdapter } from "../common/adapters/NetflixSiteAdapter.ts";
 
 SiteAdapterRegistry.register(new YouTubeSiteAdapter());
 SiteAdapterRegistry.register(new CinebySiteAdapter());
+SiteAdapterRegistry.register(new NetflixSiteAdapter());
 
 function injectAdapterStyles(styles: string, id: string): void {
   document.getElementById(id)?.remove();

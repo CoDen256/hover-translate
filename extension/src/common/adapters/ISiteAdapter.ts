@@ -38,4 +38,21 @@ export interface ISiteAdapter {
    * pointer-events fixes, hit-box padding). Keeps shared styles.css clean.
    */
   readonly styles?: string;
+
+  /**
+   * Optional: when true, MutationObserverService will call updateCaptionWindowSize()
+   * after splitting caption segments. Only needed for sites (e.g. YouTube) where the
+   * caption window has no explicit width and needs to be measured from its content.
+   * Sites that manage their own container width (Netflix, Cineby) should leave this
+   * unset (defaults to false) to avoid overriding their layout.
+   */
+  readonly manageCaptionWindowWidth?: boolean;
+
+  /**
+   * Optional: when true, word hover is detected via document-level pointermove
+   * + elementsFromPoint instead of pointerenter/leave on individual spans.
+   * Use on sites (e.g. Netflix) where a transparent overlay intercepts pointer
+   * events before they reach subtitle spans.
+   */
+  readonly usePointerDelegation?: boolean;
 }
